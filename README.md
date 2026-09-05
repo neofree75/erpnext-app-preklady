@@ -31,7 +31,7 @@ Po inštalácii sa v ľavom paneli workspace **Integrations** objaví sekcia
 **Preklady** s dvoma položkami: *Translation Sync Settings* a
 *Translation Sync Log*.
 
-![Sekcia Preklady v bočnom paneli workspace Integrácia](docs/images/sidebar-preklady.png)
+<img src="docs/images/sidebar-preklady.png" alt="Sekcia Preklady v bočnom paneli workspace Integrácia" width="260">
 
 *Bočný panel workspace **Integrácia**. Sekcia **Preklady** je celý používateľský
 vstup do aplikácie: **Translation Sync Settings** (nastavenie a ručné spustenie)
