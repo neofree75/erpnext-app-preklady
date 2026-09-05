@@ -1,0 +1,108 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-09-05 10:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "app",
+  "locale",
+  "version",
+  "status",
+  "column_break_main",
+  "source",
+  "checksum",
+  "message_count",
+  "section_detail",
+  "mo_path",
+  "error"
+ ],
+ "fields": [
+  {
+   "fieldname": "app",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Aplikácia"
+  },
+  {
+   "fieldname": "locale",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Jazyk"
+  },
+  {
+   "fieldname": "version",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Verzia"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Stav",
+   "options": "Úspech\nChyba\nPreskočené"
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "source",
+   "fieldtype": "Select",
+   "label": "Zdroj",
+   "options": "Hub\nManuálny upload\nPrekompilovanie"
+  },
+  {
+   "fieldname": "checksum",
+   "fieldtype": "Data",
+   "label": "Checksum"
+  },
+  {
+   "fieldname": "message_count",
+   "fieldtype": "Int",
+   "label": "Počet reťazcov"
+  },
+  {
+   "fieldname": "section_detail",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "mo_path",
+   "fieldtype": "Data",
+   "label": "Cesta k .mo",
+   "read_only": 1
+  },
+  {
+   "fieldname": "error",
+   "fieldtype": "Code",
+   "label": "Chyba",
+   "read_only": 1
+  }
+ ],
+ "in_create": 1,
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-09-05 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Translation Sync",
+ "name": "Translation Sync Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}

@@ -1,0 +1,132 @@
+{
+ "actions": [],
+ "creation": "2026-09-05 10:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "hub_url",
+  "token",
+  "column_break_conn",
+  "locale",
+  "auto_sync",
+  "sync_frequency",
+  "section_scope",
+  "only_apps",
+  "section_status",
+  "last_sync",
+  "last_status",
+  "column_break_status",
+  "installed_state"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Zapnuté"
+  },
+  {
+   "fieldname": "hub_url",
+   "fieldtype": "Data",
+   "label": "URL servera prekladov",
+   "options": "URL",
+   "description": "Napr. https://preklady.example.sk"
+  },
+  {
+   "fieldname": "token",
+   "fieldtype": "Password",
+   "label": "Licenčný kľúč"
+  },
+  {
+   "fieldname": "column_break_conn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "sk",
+   "fieldname": "locale",
+   "fieldtype": "Link",
+   "label": "Jazyk",
+   "options": "Language"
+  },
+  {
+   "default": "1",
+   "fieldname": "auto_sync",
+   "fieldtype": "Check",
+   "label": "Automatická synchronizácia"
+  },
+  {
+   "default": "Denne",
+   "depends_on": "auto_sync",
+   "fieldname": "sync_frequency",
+   "fieldtype": "Select",
+   "label": "Frekvencia",
+   "options": "Denne\nTýždenne"
+  },
+  {
+   "fieldname": "section_scope",
+   "fieldtype": "Section Break",
+   "label": "Rozsah"
+  },
+  {
+   "fieldname": "only_apps",
+   "fieldtype": "Small Text",
+   "label": "Iba tieto aplikácie",
+   "description": "Názvy apiek oddelené čiarkou. Prázdne = všetko, na čo máš predplatné a čo je na site nainštalované."
+  },
+  {
+   "fieldname": "section_status",
+   "fieldtype": "Section Break",
+   "label": "Stav"
+  },
+  {
+   "fieldname": "last_sync",
+   "fieldtype": "Datetime",
+   "label": "Posledná synchronizácia",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_status",
+   "fieldtype": "Data",
+   "label": "Posledný výsledok",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_status",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "installed_state",
+   "fieldtype": "Code",
+   "label": "Nasadené balíčky",
+   "options": "JSON",
+   "read_only": 1,
+   "description": "Mapa aplikácia → checksum. Slúži na preskočenie nezmenených balíčkov."
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-05 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Translation Sync",
+ "name": "Translation Sync Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
