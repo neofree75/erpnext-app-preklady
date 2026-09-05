@@ -1,90 +1,104 @@
-# SK Translations (klient)
+# SK Translations
 
-Nasadzuje preklady (`.po`) na Frappe / ERPNext v16 bez kopírovania súborov
-cez FTP a bez spúšťania `bench`.
+Slovenské (a ďalšie jazykové) preklady pre Frappe / ERPNext v16, ktoré sa
+nasadzujú automaticky — bez kopírovania súborov na server a bez spúšťania
+`bench`.
 
-Protistrana je samostatná apka **[sk_translations_hub](../erpnext-app-preklady-hub)**,
-ktorá beží na distribučnom serveri. Táto apka sa k nemu hlási licenčným kľúčom.
+Aplikácia sa v nastavenom intervale spojí s distribučným serverom prekladov,
+stiahne aktuálne jazykové balíčky, skompiluje ich a preklad sa prejaví hneď po
+obnovení stránky (F5). Netreba reštart, migráciu ani zásah do súborov servera.
 
-## Ako to funguje
+Vyvinula firma **Code Way, s.r.o.** — [codeway.sk](https://codeway.sk) ·
+[info@codeway.sk](mailto:info@codeway.sk)
 
-```
-hub  ──token──▶  stiahne .po
-                 uloží do private files
-                 skompiluje .mo
-                 frappe.translate.clear_cache()
-```
+## Požiadavky
 
-## Prečo netreba `bench`
-
-Overené v zdrojákoch Frappe v16:
-
-| Predpoklad | Realita |
-|---|---|
-| `.mo` sa musí zapísať do `apps/` | `get_mo_path()` → `sites/assets/locale/<locale>/LC_MESSAGES/<app>.mo`. `apps/` sa nedotýkame, takže read-only image v Dockeri nevadí. |
-| treba spustiť `bench compile-po-to-mo` | ten príkaz je len wrapper nad `read_po()` + `write_mo()`; voláme ich priamo v procese |
-| treba `bench migrate` | migrate s prekladmi nesúvisí |
-| treba reštart supervisora | zlúčené preklady sú v Redise (`frappe.cache.hget(MERGED_TRANSLATION_KEY, lang)`), nie v pamäti workera — `frappe.translate.clear_cache()` stačí |
-
-Používateľ uvidí nový preklad po refreshi stránky (F5).
+- Frappe Framework / ERPNext **v16**
+- Python 3.14+
+- Prístup zo servera na internet (HTTPS na server prekladov)
+- Rola **System Manager** na inštaláciu a nastavenie
+- **Licenčný kľúč a URL servera prekladov** — poskytne Code Way, s.r.o.
+  (napíšte na [info@codeway.sk](mailto:info@codeway.sk))
 
 ## Inštalácia
 
 ```bash
-bench get-app sk_translations <repo-url>
-bench --site <site> install-app sk_translations
+bench get-app sk_translations https://github.com/neofree75/erpnext-app-preklady.git
+bench --site <vasa-site> install-app sk_translations
 ```
 
-Potom **Translation Sync Settings** → URL hubu + licenčný kľúč. Tlačidlo
-*Synchronizovať teraz* spustí sync na pozadí, výsledok je v **Translation Sync Log**.
-Ďalej to beží samo podľa nastavenej frekvencie.
+Po inštalácii sa v ľavom paneli workspace **Integrations** objaví sekcia
+**Preklady** s dvoma položkami: *Translation Sync Settings* a
+*Translation Sync Log*.
 
-Bez pripojenia na hub sa dá `.po` nasadiť ručne cez
-`sk_translations.sync.upload_po(file_url, app, locale)`.
+## Nastavenie
 
-## Ak sa DocTypy po inštalácii nevytvoria
+Otvorte **Translation Sync Settings** a vyplňte:
 
-`bench get-app` na záver reštartuje supervisor cez `sudo`. Ak to zlyhá (user
-`frappe` nemá `sudo supervisorctl`), zostane v Redise stará hodnota kľúča
-`app_modules` — bez apky. `install-app` potom v `sync_for()` nenájde žiadny
-modul a **ticho preskočí import DocTypov**: v logu chýba riadok
-`Updating DocTypes for sk_translations`.
+| Pole | Význam |
+|---|---|
+| **Zapnuté** | Hlavný vypínač aplikácie. |
+| **URL servera prekladov** | Adresa, ktorú vám poskytla Code Way, s.r.o. |
+| **Licenčný kľúč** | Kľúč, ktorý vám poskytla Code Way, s.r.o. |
+| **Jazyk** | Jazyk prekladov, predvolene `sk`. |
+| **Automatická synchronizácia** | Zapne pravidelné sťahovanie na pozadí. |
+| **Frekvencia** | *Denne* alebo *Týždenne*. |
+| **Iba tieto aplikácie** | Voliteľné. Zoznam aplikácií, ktoré sa majú prekladať; prázdne = všetky dostupné. |
 
-Náprava:
+Uložte a kliknite na **Synchronizovať teraz**. Sync beží na pozadí; po chvíli
+sa v sekcii *Stav* doplní **Posledná synchronizácia** a **Posledný výsledok**.
 
-```python
-# bench --site <site> console
-import frappe
-from frappe.model.sync import sync_for
+Potom stránku obnovte (F5) a preklady sú nasadené. Ďalej to už beží samo podľa
+nastavenej frekvencie.
 
-frappe.cache.delete_value("app_modules")
-frappe.client_cache.delete_value("installed_app_modules")
-frappe.setup_module_map()
+## Overenie, že to funguje
 
-sync_for("sk_translations", force=1, reset_permissions=True)
-frappe.db.commit()
-```
+V **Translation Sync Log** je jeden záznam na každý nasadený balíček:
+aplikácia, jazyk, verzia, počet reťazcov a stav (*Úspech*, *Chyba*,
+*Preskočené*). Pri chybe je v zázname aj jej popis.
 
-Potom ako root reštartovať workery, aby videli novú apku:
+## Riešenie problémov
 
-```bash
-supervisorctl restart frappe-bench-web: frappe-bench-workers:
-```
+**Preklady sa nezmenili.** Obnovte stránku (F5) — prehliadač má staré reťazce
+načítané. Ak to nepomôže, skontrolujte posledný záznam v *Translation Sync Log*.
 
-## Na čo si dať pozor
+**Stav „Preskočené".** Balíček je pre aplikáciu, ktorá na vašej inštancii nie
+je nainštalovaná, alebo je už nasadená rovnaká verzia. To je v poriadku.
 
-- **Kód jazyka rozhoduje o ceste k `.mo`.** `gettext.find()` hľadá adresár
-  presne podľa kódu jazyka. Rozhoduje pole `language` v balíčku — hlavička
-  `Language:` v `.po` je len metadáta a ignoruje sa. Používame `sk`.
-- **`.po` je viazané na verziu apky.** Balíček nesie rozsah
-  `min_app_version`–`max_app_version`; nesúlad sa zaloguje, ale nasadenie
-  nezablokuje (chýbajúce reťazce padnú na angličtinu).
-- **Preklad apky, ktorá nie je nainštalovaná, sa preskočí** — `validate_app()`
-  to zároveň chráni pred path traversal cez názov apky.
-- **`after_migrate` prekompiluje `.mo`** z uložených `.po`. Bez toho by preklady
-  ticho vypadli po prestavbe kontajnera, keď sa `sites/assets/` vyprázdni.
+**Stav „Chyba".** Najčastejšie nesprávny licenčný kľúč alebo URL, prípadne
+server nemá prístup na internet. Popis chyby je priamo v zázname.
 
-## Stav
+**Časť reťazcov je po anglicky.** Balíček prekladu je pre inú verziu aplikácie,
+než akú máte nainštalovanú. Nepreložené reťazce zostanú v angličtine —
+kontaktujte nás, doplníme aktuálny balíček.
 
-Kostra. Doplniť treba: testy, workspace/onboarding, čistenie starých logov
-(Log Settings), tlačidlo na manuálny upload v UI.
+**Po inštalácii sa nevytvorili záznamy (DocTypy).** Pozrite
+[DEVELOPMENT.md](DEVELOPMENT.md#doctypy-sa-po-inštalácii-nevytvorili) alebo nám
+napíšte.
+
+## Ochrana osobných údajov
+
+Aplikácia posiela na server prekladov iba to, čo je nutné na výber správneho
+jazykového balíčka:
+
+- licenčný kľúč,
+- názov vašej site,
+- požadovaný jazyk,
+- názvy aplikácií a kontrolné súčty už nasadených balíčkov prekladov.
+
+Žiadne obchodné ani osobné údaje z vášho ERPNextu sa neodosielajú. Licenčný
+kľúč sa prenáša v tele požiadavky (nie v URL), aby nekončil v logoch.
+
+## Podpora
+
+Aplikáciu vyvinula a udržiava **Code Way, s.r.o.**
+
+- Web: [codeway.sk](https://codeway.sk)
+- E-mail: [info@codeway.sk](mailto:info@codeway.sk)
+
+Pri hlásení problému priložte prosím príslušný záznam z **Translation Sync Log**
+a verziu Frappe / ERPNextu.
+
+## Licencia
+
+MIT — pozri [license.txt](license.txt). © 2026 Code Way, s.r.o.

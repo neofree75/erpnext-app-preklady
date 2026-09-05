@@ -1,8 +1,8 @@
 app_name = "sk_translations"
 app_title = "SK Translations"
-app_publisher = "Rado Sloboda"
+app_publisher = "Code Way, s.r.o."
 app_description = "Automatické nasadzovanie prekladov (.po) z distribučného servera"
-app_email = "rado.sloboda@codeway.sk"
+app_email = "info@codeway.sk"
 app_license = "mit"
 
 # Po `bench migrate` alebo prestavbe kontajnera môže `sites/assets/locale/`

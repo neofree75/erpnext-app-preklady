@@ -1,7 +1,7 @@
 [project]
 name = "sk_translations"
 authors = [
-    { name = "Rado Sloboda", email = "rado.sloboda@codeway.sk"}
+    { name = "Code Way, s.r.o.", email = "info@codeway.sk"}
 ]
 description = "Automatické nasadzovanie prekladov (.po) z distribučného servera"
 requires-python = ">=3.14"
