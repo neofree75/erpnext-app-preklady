@@ -42,6 +42,35 @@ Potom **Translation Sync Settings** → URL hubu + licenčný kľúč. Tlačidlo
 Bez pripojenia na hub sa dá `.po` nasadiť ručne cez
 `sk_translations.sync.upload_po(file_url, app, locale)`.
 
+## Ak sa DocTypy po inštalácii nevytvoria
+
+`bench get-app` na záver reštartuje supervisor cez `sudo`. Ak to zlyhá (user
+`frappe` nemá `sudo supervisorctl`), zostane v Redise stará hodnota kľúča
+`app_modules` — bez apky. `install-app` potom v `sync_for()` nenájde žiadny
+modul a **ticho preskočí import DocTypov**: v logu chýba riadok
+`Updating DocTypes for sk_translations`.
+
+Náprava:
+
+```python
+# bench --site <site> console
+import frappe
+from frappe.model.sync import sync_for
+
+frappe.cache.delete_value("app_modules")
+frappe.client_cache.delete_value("installed_app_modules")
+frappe.setup_module_map()
+
+sync_for("sk_translations", force=1, reset_permissions=True)
+frappe.db.commit()
+```
+
+Potom ako root reštartovať workery, aby videli novú apku:
+
+```bash
+supervisorctl restart frappe-bench-web: frappe-bench-workers:
+```
+
 ## Na čo si dať pozor
 
 - **Kód jazyka rozhoduje o ceste k `.mo`.** `gettext.find()` hľadá adresár
