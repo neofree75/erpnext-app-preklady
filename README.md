@@ -31,6 +31,13 @@ Po inštalácii sa v ľavom paneli workspace **Integrations** objaví sekcia
 **Preklady** s dvoma položkami: *Translation Sync Settings* a
 *Translation Sync Log*.
 
+![Sekcia Preklady v bočnom paneli workspace Integrácia](docs/images/sidebar-preklady.png)
+
+*Bočný panel workspace **Integrácia**. Sekcia **Preklady** je celý používateľský
+vstup do aplikácie: **Translation Sync Settings** (nastavenie a ručné spustenie)
+a **Translation Sync Log** (história nasadených balíčkov). Ak sekciu nevidíte,
+obnovte stránku (F5).*
+
 ## Nastavenie
 
 Otvorte **Translation Sync Settings** a vyplňte:
@@ -45,6 +52,17 @@ Otvorte **Translation Sync Settings** a vyplňte:
 | **Frekvencia** | *Denne* alebo *Týždenne*. |
 | **Iba tieto aplikácie** | Voliteľné. Zoznam aplikácií, ktoré sa majú prekladať; prázdne = všetky dostupné. |
 
+![Obrazovka Translation Sync Settings](docs/images/translation-sync-settings.png)
+
+*Obrazovka **Translation Sync Settings**. Hore vľavo je pripojenie na server
+(URL a licenčný kľúč), vpravo jazyk a plán automatickej synchronizácie. Sekcia
+**Rozsah** obmedzuje preklad na vybrané aplikácie (`erpnext` na obrázku), sekcia
+**Stav** je len na čítanie — ukazuje čas poslednej synchronizácie, jej výsledok
+(`Nasadené: 1, preskočené: 0, chyby: 0`) a mapu *aplikácia → checksum*, podľa
+ktorej sa nezmenené balíčky preskakujú. Tlačidlá vpravo hore: **Synchronizovať
+teraz** stiahne a nasadí balíčky, **Prekompilovať uložené .po** znovu zostaví
+`.mo` súbory z už stiahnutých prekladov bez volania servera.*
+
 Uložte a kliknite na **Synchronizovať teraz**. Sync beží na pozadí; po chvíli
 sa v sekcii *Stav* doplní **Posledná synchronizácia** a **Posledný výsledok**.
 
@@ -56,6 +74,15 @@ nastavenej frekvencie.
 V **Translation Sync Log** je jeden záznam na každý nasadený balíček:
 aplikácia, jazyk, verzia, počet reťazcov a stav (*Úspech*, *Chyba*,
 *Preskočené*). Pri chybe je v zázname aj jej popis.
+
+![Záznam v Translation Sync Log](docs/images/translation-sync-log.png)
+
+*Detail záznamu v **Translation Sync Log**. **Aplikácia** a **Jazyk** hovoria,
+čoho sa balíček týka, **Zdroj** odkiaľ prišiel (*Hub* = server prekladov),
+**Verzia** a **Checksum** identifikujú konkrétny balíček, **Počet reťazcov** je
+množstvo preložených textov (8770 v ukážke) a **Cesta k .mo** je skompilovaný
+súbor, ktorý Frappe reálne používa. Stav **Úspech** v hlavičke znamená, že
+balíček je nasadený.*
 
 ## Riešenie problémov
 
