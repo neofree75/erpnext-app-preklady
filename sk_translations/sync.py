@@ -67,7 +67,8 @@ def run_sync(force: bool = False) -> dict:
 	state = {} if force else settings.get_installed_state()
 
 	try:
-		updates = _call_hub(settings, "check_updates", {"installed": state, "locale": locale})["updates"]
+		response = _call_hub(settings, "check_updates", {"installed": state, "locale": locale})
+		updates = response["updates"]
 	except Exception as e:
 		settings.db_set({"last_sync": now_datetime(), "last_status": f"Chyba: {e}"})
 		add_log(source="Hub", status="Chyba", locale=locale, error=frappe.get_traceback())
@@ -81,8 +82,16 @@ def run_sync(force: bool = False) -> dict:
 		app = update["app"]
 
 		# Preklad apky, ktorú zákazník nemá, nemá kam ísť.
-		if app not in installed_apps or (selected and app not in selected):
+		if app not in installed_apps:
+			reason = _("Aplikácia nie je na tomto site nainštalovaná")
+		elif selected and app not in selected:
+			reason = _("Aplikácia nie je v poli „Iba tieto aplikácie“")
+		else:
+			reason = None
+
+		if reason:
 			skipped += 1
+			add_log(source="Hub", status="Preskočené", app=app, locale=locale, error=reason)
 			continue
 
 		try:
@@ -96,6 +105,12 @@ def run_sync(force: bool = False) -> dict:
 			failed += 1
 			add_log(source="Hub", status="Chyba", app=app, locale=locale, error=frappe.get_traceback())
 			frappe.log_error(title=f"sk_translations: sync {app} zlyhal")
+
+	# Apky z predplatného, pre ktoré hub zatiaľ nemá publikovaný balíček.
+	for app in response.get("missing", []):
+		skipped += 1
+		add_log(source="Hub", status="Preskočené", app=app, locale=locale,
+			error=_("Na serveri prekladov nie je publikovaný balíček pre tento jazyk"))
 
 	settings.set_installed_state(state)
 	settings.db_set(
