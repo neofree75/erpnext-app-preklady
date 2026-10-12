@@ -130,19 +130,44 @@ def _call_hub(settings, method: str, payload: dict) -> dict:
 	import requests
 
 	url = f"{settings.hub_url}/api/method/sk_translations_hub.api.{method}"
-	body = {"token": settings.get_password("token"), "site": frappe.local.site, **payload}
+	body = {
+		"token": settings.get_password("token"),
+		"site": frappe.local.site,
+		"instance_id": settings.get_instance_id(),
+		**payload,
+	}
 
 	response = requests.post(url, json=body, timeout=REQUEST_TIMEOUT)
-	response.raise_for_status()
+
+	if not response.ok:
+		frappe.throw(_hub_error(response), title=_("Server prekladov odmietol požiadavku"))
 
 	return response.json()["message"]
+
+
+def _hub_error(response) -> str:
+	"""Vytiahni zo zlyhanej odpovede hubu čitateľnú správu (napr. odmietnutý kľúč)."""
+	fallback = f"HTTP {response.status_code}: {response.reason}"
+
+	try:
+		data = response.json()
+		messages = [frappe.parse_json(m).get("message") for m in frappe.parse_json(data.get("_server_messages") or "[]")]
+		# Výnimka bez msgprint chodí len ako "frappe.exceptions.X: správa".
+		exception = (data.get("exception") or "").split(": ", 1)[-1]
+		return " ".join(m for m in messages if m) or exception or fallback
+	except Exception:
+		return fallback
 
 
 def _apply_package(package: dict, locale: str) -> dict:
 	"""Over integritu a kompatibilitu balíčka, potom ho nasaď."""
 	po_bytes = base64.b64decode(package["content"])
 
-	if hashlib.sha256(po_bytes).hexdigest() != package["checksum"]:
+	# Hub balíček označí pre konkrétne predplatné, preto sa doručené bajty
+	# overujú voči `content_checksum`. `checksum` ostáva identitou verzie.
+	expected = package.get("content_checksum") or package["checksum"]
+
+	if hashlib.sha256(po_bytes).hexdigest() != expected:
 		frappe.throw(_("Checksum stiahnutého balíčka nesedí — prenos je poškodený"))
 
 	_warn_on_version_mismatch(package)

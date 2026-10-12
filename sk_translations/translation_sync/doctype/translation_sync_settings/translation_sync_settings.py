@@ -1,4 +1,5 @@
 import json
+import uuid
 
 import frappe
 from frappe import _
@@ -29,3 +30,14 @@ class TranslationSyncSettings(Document):
 
 	def set_installed_state(self, state: dict[str, str]) -> None:
 		self.db_set("installed_state", json.dumps(state, indent=1, sort_keys=True))
+
+	def get_instance_id(self) -> str:
+		"""Trvalé ID tejto inštalácie pre server prekladov.
+
+		Viaže sa na názov site: klon databázy pod iným názvom (staging, kópia
+		pre iného klienta) dostane nové ID a server ho posúdi ako novú inštanciu.
+		"""
+		if not self.instance_id or self.instance_site != frappe.local.site:
+			self.db_set({"instance_id": uuid.uuid4().hex, "instance_site": frappe.local.site})
+
+		return self.instance_id

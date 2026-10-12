@@ -18,7 +18,9 @@
   "last_sync",
   "last_status",
   "column_break_status",
-  "installed_state"
+  "installed_state",
+  "instance_id",
+  "instance_site"
  ],
  "fields": [
   {
@@ -103,12 +105,26 @@
    "options": "JSON",
    "read_only": 1,
    "description": "Mapa aplikácia → checksum. Slúži na preskočenie nezmenených balíčkov."
+  },
+  {
+   "fieldname": "instance_id",
+   "fieldtype": "Data",
+   "label": "ID inštancie",
+   "read_only": 1,
+   "description": "Identifikuje túto inštaláciu na serveri prekladov. Licenčný kľúč platí len pre povolený počet inštancií."
+  },
+  {
+   "fieldname": "instance_site",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Site inštancie",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-09-05 10:00:00.000000",
+ "modified": "2026-10-12 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Translation Sync",
  "name": "Translation Sync Settings",
