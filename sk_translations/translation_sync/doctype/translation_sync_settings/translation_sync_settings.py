@@ -1,5 +1,6 @@
 import json
 import uuid
+from contextlib import contextmanager
 
 import frappe
 from frappe import _
@@ -37,7 +38,50 @@ class TranslationSyncSettings(Document):
 		Viaže sa na názov site: klon databázy pod iným názvom (staging, kópia
 		pre iného klienta) dostane nové ID a server ho posúdi ako novú inštanciu.
 		"""
-		if not self.instance_id or self.instance_site != frappe.local.site:
-			self.db_set({"instance_id": uuid.uuid4().hex, "instance_site": frappe.local.site})
+		if self.instance_id and self.instance_site == frappe.local.site:
+			return self.instance_id
+
+		# Pri prvom syncu môžu ID generovať dva procesy naraz (scheduler a ručný
+		# sync, v Dockeri aj z rôznych kontajnerov). Bez zámku by server jedno
+		# zaregistroval a druhé odmietol — a v DB by mohlo ostať práve odmietnuté.
+		with _db_lock(f"sk_translations_instance_id:{frappe.local.site}"):
+			# Zamykajúce čítanie — obyčajné by v REPEATABLE READ mohlo vrátiť
+			# snapshot spred commitu druhého procesu.
+			singles = frappe.qb.DocType("Singles")
+			stored = dict(
+				frappe.qb.from_(singles)
+				.select(singles.field, singles.value)
+				.where((singles.doctype == self.doctype) & singles.field.isin(["instance_id", "instance_site"]))
+				.for_update()
+				.run()
+			)
+			instance_id, instance_site = stored.get("instance_id"), stored.get("instance_site")
+
+			if not instance_id or instance_site != frappe.local.site:
+				instance_id = uuid.uuid4().hex
+				frappe.db.set_single_value(
+					self.doctype, {"instance_id": instance_id, "instance_site": frappe.local.site}
+				)
+				# Commit ešte pod zámkom, aby druhý proces po jeho uvoľnení videl nové ID.
+				frappe.db.commit()
+
+		self.instance_id, self.instance_site = instance_id, frappe.local.site
 
 		return self.instance_id
+
+
+@contextmanager
+def _db_lock(name: str, timeout: int = 30):
+	"""Pomenovaný zámok v databáze — platí naprieč procesmi aj kontajnermi."""
+	if frappe.db.db_type == "postgres":
+		frappe.db.sql("select pg_advisory_lock(hashtext(%s))", name)
+	elif not frappe.db.sql("select get_lock(%s, %s)", (name, timeout))[0][0]:
+		frappe.throw(_("Nepodarilo sa získať zámok {0}").format(name))
+
+	try:
+		yield
+	finally:
+		if frappe.db.db_type == "postgres":
+			frappe.db.sql("select pg_advisory_unlock(hashtext(%s))", name)
+		else:
+			frappe.db.sql("select release_lock(%s)", name)
