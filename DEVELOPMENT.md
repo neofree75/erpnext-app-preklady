@@ -25,8 +25,8 @@ Vstupné body:
 |---|---|
 | `sync.py` | komunikácia s hubom, `sync_now()`, `recompile_now()`, `upload_po()`, plánované úlohy |
 | `translations.py` | `apply_po()`, `recompile_all()`, `validate_app()`, `normalize_locale()` |
-| `desk.py` | `ensure_rail_entry()` — tlačidlo na raile ERPNext pri uloženom usporiadaní; `ensure_sidebar_items()` — sekcia v *Integrations* len pre Frappe bez Docku |
-| `dock/`, `translation_sync/sidebar/`, `translation_sync/workspace/` | tlačidlo **Preklady** na raile ERPNext (`mount_on: erpnext`), jeho bočný panel a workspace |
+| `desk.py` | `ensure_rail_entry()` — tlačidlo na raile Frappe pri uloženom usporiadaní; `ensure_sidebar_items()` — sekcia v *Integrations* len pre Frappe bez Docku |
+| `dock/`, `translation_sync/sidebar/`, `translation_sync/workspace/` | tlačidlo **Preklady** na raile Frappe (`mount_on: frappe`), jeho bočný panel a workspace |
 | `install.py` | `after_install()` |
 
 ## Prečo netreba `bench`

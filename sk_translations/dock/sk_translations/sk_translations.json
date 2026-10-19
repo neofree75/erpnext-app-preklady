@@ -14,9 +14,9 @@
    "title": "Preklady"
   }
  ],
- "modified": "2026-10-19 12:00:00.000000",
+ "modified": "2026-10-19 14:00:00.000000",
  "modified_by": "Administrator",
- "mount_on": "erpnext",
+ "mount_on": "frappe",
  "name": "sk_translations",
  "owner": "Administrator",
  "standard": 1,

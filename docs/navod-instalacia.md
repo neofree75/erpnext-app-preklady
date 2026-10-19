@@ -41,7 +41,7 @@ bench --site <vasa-site> install-app sk_translations
 
 `<vasa-site>` nahraďte názvom vašej site (napríklad `firma.erp.sk`).
 
-Po inštalácii sa na raile (docku) ERPNext objaví tlačidlo **Preklady**. Otvorí
+Po inštalácii sa na raile (docku) Frappe (Framework) objaví tlačidlo **Preklady**. Otvorí
 bočný panel s dvoma položkami (na starších verziách Frappe bez Docku je to sekcia
 **Preklady** v ľavom paneli workspace **Integrácia**):
 

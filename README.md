@@ -27,7 +27,7 @@ bench get-app sk_translations https://github.com/neofree75/erpnext-app-preklady.
 bench --site <vasa-site> install-app sk_translations
 ```
 
-Po inštalácii sa na raile (docku) ERPNext objaví tlačidlo **Preklady**
+Po inštalácii sa na raile (docku) Frappe (Framework) objaví tlačidlo **Preklady**
 (Frappe 16 s Dockom, napr. 16.51+). Otvorí vlastný bočný panel s položkami
 *Translation Sync Settings* a *Translation Sync Log*. Na starších verziách
 Frappe bez Docku sa namiesto toho objaví sekcia **Preklady** v ľavom paneli

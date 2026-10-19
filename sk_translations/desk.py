@@ -7,8 +7,8 @@ ITEMS = (
 	("Translation Sync Log", "Translation Sync Log", "history"),
 )
 
-# Tlačidlo na raile ERPNext; definuje ho `dock/sk_translations/sk_translations.json`.
-RAIL_HOST = "erpnext"
+# Tlačidlo na raile Frappe (Framework); definuje ho `dock/sk_translations/sk_translations.json`.
+RAIL_HOST = "frappe"
 RAIL_ENTRY = {"link_type": "Sidebar", "link_to": "Translation Sync", "hidden": 0}
 
 
@@ -18,9 +18,9 @@ def has_dock():
 
 
 def ensure_rail_entry():
-	"""Zobraz tlačidlo Preklady na raile ERPNext aj na site, ktorý má rail uložený (Manage Dock).
+	"""Zobraz tlačidlo Preklady na raile Frappe aj na site, ktorý má rail uložený (Manage Dock).
 
-	Bez uloženého usporiadania sa tlačidlo zobrazí samo z nášho `Dock` (`mount_on: erpnext`).
+	Bez uloženého usporiadania sa tlačidlo zobrazí samo z nášho `Dock` (`mount_on: frappe`).
 	Uložené usporiadanie však Frappe o nové tlačidlá appky nedopĺňa, len ich ponúkne na pridanie.
 	Voláme preto len z `after_install` a z patchu, nie z `after_migrate`, aby sme neprepisovali
 	neskoršie presunutie alebo skrytie tlačidla na site.
@@ -39,7 +39,7 @@ def ensure_rail_entry():
 			return
 		save_site_dock(RAIL_HOST, [*rows, dict(RAIL_ENTRY)])
 	except Exception:
-		frappe.log_error(title="Pridanie tlačidla Preklady na rail ERPNext")
+		frappe.log_error(title="Pridanie tlačidla Preklady na rail Frappe")
 
 
 def ensure_sidebar_items():
