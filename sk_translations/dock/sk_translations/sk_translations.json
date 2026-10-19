@@ -1,0 +1,24 @@
+{
+ "app": "sk_translations",
+ "creation": "2026-10-19 12:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Dock",
+ "idx": 0,
+ "items": [
+  {
+   "added": 0,
+   "hidden": 0,
+   "icon": "languages",
+   "link_to": "Translation Sync",
+   "link_type": "Sidebar",
+   "title": "Preklady"
+  }
+ ],
+ "modified": "2026-10-19 12:00:00.000000",
+ "modified_by": "Administrator",
+ "mount_on": "erpnext",
+ "name": "sk_translations",
+ "owner": "Administrator",
+ "standard": 1,
+ "user": ""
+}

@@ -25,7 +25,8 @@ Vstupné body:
 |---|---|
 | `sync.py` | komunikácia s hubom, `sync_now()`, `recompile_now()`, `upload_po()`, plánované úlohy |
 | `translations.py` | `apply_po()`, `recompile_all()`, `validate_app()`, `normalize_locale()` |
-| `desk.py` | `ensure_sidebar_items()` — položky vo workspace sidebare *Integrations* |
+| `desk.py` | `ensure_rail_entry()` — tlačidlo na raile ERPNext pri uloženom usporiadaní; `ensure_sidebar_items()` — sekcia v *Integrations* len pre Frappe bez Docku |
+| `dock/`, `translation_sync/sidebar/`, `translation_sync/workspace/` | tlačidlo **Preklady** na raile ERPNext (`mount_on: erpnext`), jeho bočný panel a workspace |
 | `install.py` | `after_install()` |
 
 ## Prečo netreba `bench`
@@ -54,7 +55,11 @@ Používateľ uvidí nový preklad po refreshi stránky (F5).
 - **`after_migrate` prekompiluje `.mo`** z uložených `.po`. Bez toho by preklady
   ticho vypadli po prestavbe kontajnera, keď sa `sites/assets/` vyprázdni.
 - **`ensure_sidebar_items()` beží aj v `after_migrate`**, lebo Frappe pri migrate
-  reimportuje štandardný `Workspace Sidebar` a naše položky zmiznú.
+  reimportuje štandardný `Workspace Sidebar` a naše položky zmiznú. Na Frappe s Dockom
+  nerobí nič.
+- **`ensure_rail_entry()` beží len v `after_install` a patchi `add_rail_entry`**, nie
+  v `after_migrate`. Site s uloženým usporiadaním railu (Manage Dock) nové tlačidlá appky
+  sama nedopĺňa; neskoršie presunutie či skrytie tlačidla na site neprepisujeme.
 
 ## Ručné nasadenie `.po`
 

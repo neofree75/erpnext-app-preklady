@@ -1,6 +1,6 @@
 import frappe
 
-from sk_translations.desk import ensure_sidebar_items
+from sk_translations.desk import ensure_rail_entry, ensure_sidebar_items
 
 
 def after_install():
@@ -20,3 +20,4 @@ def after_install():
 		).insert(ignore_permissions=True)
 
 	ensure_sidebar_items()
+	ensure_rail_entry()

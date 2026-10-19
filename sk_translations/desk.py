@@ -7,15 +7,52 @@ ITEMS = (
 	("Translation Sync Log", "Translation Sync Log", "history"),
 )
 
+# Tlačidlo na raile ERPNext; definuje ho `dock/sk_translations/sk_translations.json`.
+RAIL_HOST = "erpnext"
+RAIL_ENTRY = {"link_type": "Sidebar", "link_to": "Translation Sync", "hidden": 0}
+
+
+def has_dock():
+	"""Frappe 16 s doctypom Dock kreslí rail z `Dock` a vlastného `Sidebar` modulu."""
+	return bool(frappe.db.exists("DocType", "Dock"))
+
+
+def ensure_rail_entry():
+	"""Zobraz tlačidlo Preklady na raile ERPNext aj na site, ktorý má rail uložený (Manage Dock).
+
+	Bez uloženého usporiadania sa tlačidlo zobrazí samo z nášho `Dock` (`mount_on: erpnext`).
+	Uložené usporiadanie však Frappe o nové tlačidlá appky nedopĺňa, len ich ponúkne na pridanie.
+	Voláme preto len z `after_install` a z patchu, nie z `after_migrate`, aby sme neprepisovali
+	neskoršie presunutie alebo skrytie tlačidla na site.
+	"""
+	try:
+		from frappe.desk.doctype.dock.dock import get_dock, save_site_dock, stored_row
+	except ImportError:
+		return  # staršia verzia Frappe bez Dock
+
+	try:
+		site = get_dock(RAIL_HOST, None, 0)
+		if not site:
+			return
+		rows = [stored_row(row) for row in site.items]
+		if any(row.get("link_to") == RAIL_ENTRY["link_to"] for row in rows):
+			return
+		save_site_dock(RAIL_HOST, [*rows, dict(RAIL_ENTRY)])
+	except Exception:
+		frappe.log_error(title="Pridanie tlačidla Preklady na rail ERPNext")
+
 
 def ensure_sidebar_items():
 	"""Doplň sekciu Preklady do ľavého sidebaru workspace Integrations.
+
+	Len pre Frappe bez doctypu Dock — novšie verzie `Workspace Sidebar` v menu nezobrazujú
+	a appka má vlastný `Sidebar` a tlačidlo na raile.
 
 	Frappe pri `bench migrate` reimportuje štandardný Workspace Sidebar zo
 	svojho `workspace_sidebar/integrations.json`, takže naše položky zmiznú
 	a treba ich doplniť znova. Voláme z `after_migrate` aj `after_install`.
 	"""
-	if not frappe.db.exists("Workspace Sidebar", SIDEBAR):
+	if has_dock() or not frappe.db.exists("Workspace Sidebar", SIDEBAR):
 		return
 
 	sidebar = frappe.get_doc("Workspace Sidebar", SIDEBAR)
